@@ -28,12 +28,12 @@ Hopefully, this documentation provides a lot of value for others. The contributo
     * Build the PAB services bundled with the sample contract into one executable. 
     * Please refer to the [Build Application Bundle guide](2-BUILD_APP_BUNDLE.md) for instructions to set up.
 
-3. **Start all the backend services and the bundled application
+3. **Start all the backend services and the bundled application**
 
     * Start a relay node pointing at Cardano testnet, `cardano-wallet` API server, `chain-index` and the bundle Application code
     * Please refer to the [Start Services guide](3-START_SERVICES.md) for instructions. 
 
-4. **Interact with the application
+4. **Interact with the application**
 
     * Set up 2 user wallets and interact with the contract to verify it works
     * Please refer to the [Use Application guide](4-USE_APP.md) for instructions.
