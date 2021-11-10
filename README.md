@@ -26,23 +26,18 @@ Hopefully, this documentation provides a lot of value for others. The contributo
 2. **Build sample app and PAB package dependencies** 
     
     * Build the PAB services bundled with the sample contract into one executable. 
-    * Please refer to the [Install posgreSQL](2-INSTALL_POSTGRESQL.md) for instructions to set up.
+    * Please refer to the [Build Application Bundle guide](2-BUILD_APP_BUNDLE.md) for instructions to set up.
 
-3. **Run scripts to set up & run private Cardano network and connect DB Sync process**
+3. **Start all the backend services and the bundled application
 
-    * Run scripts to bootstrap the Cardano private network and attach the `cardano-db-sync` process to it to sync blockchain data to SQL database.
-    * Please refer to the [Run network scripts guide](3-RUN_NETWORK_SCRIPTS.md) for instructions. 
+    * Start a relay node pointing at Cardano testnet, `cardano-wallet` API server, `chain-index` and the bundle Application code
+    * Please refer to the [Start Services guide](3-START_SERVICES.md) for instructions. 
 
-4. **Attach DB Sync process the network**
+4. **Interact with the application
 
-    * Attach the `cardano-db-sync` process to the network, which syncs blockchain data to a `PostgreSQL` database.
-    * Please refer to the [Attach db-sync guide](4-ATTACH_DB_SYNC.md) for instructions.
-
-5. **Run simple transaction and query the db-sync database to see results**
-
-    * Set up a new walllet for user2 and make a payment from user1 to user2. Query the database to confirm the transaction.
-    * Please refer to the [Run transaction guide](5-RUN_TRANSACTION.md) for instructions.
-
+    * Set up 2 user wallets and interact with the contract to verify it works
+    * Please refer to the [Use Application guide](4-USE_APP.md) for instructions.
+    
 ## Contributors
 
 This project is provided free of charge to the Cardano community. The author of this project is a fan of Cardano, as well as a Cardano stake pool operator.
