@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeFamilies        #-}
 
-module AppContract (
+module Controller (
     AppContracts(..)
     , handlers
     ) where

@@ -4,7 +4,7 @@ module Main
     ( main
     ) where
 
-import AppContract (AppContracts)
+import Controller (AppContracts)
 import Plutus.PAB.Effects.Contract.Builtin qualified as Builtin
 import Plutus.PAB.Run (runWith)
 
