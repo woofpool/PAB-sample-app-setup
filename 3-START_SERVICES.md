@@ -61,7 +61,6 @@
   ```
 
 ## Run the wallet API server
-TODO: WHY 8090
 This step starts a wallet API server listening on port 8090. We can use this wallet server API for: blah, blah
 - **In a new terminal**, run `cardano-wallet`
   ```shell
@@ -111,7 +110,11 @@ This step starts a wallet API server listening on port 8090. We can use this wal
       -XGET localhost:8090/v2/wallets/$WALLET_ID/addresses | jq '.'
      
   ```
-- Get some tAda from the [testnet faucet](https://testnets.cardano.org/en/testnets/cardano/tools/faucet/)
+- Get some test Ada from the [testnet faucet](https://testnets.cardano.org/en/testnets/cardano/tools/faucet/)
+  - On the page, you can paste an unused wallet address that you found above into the address field and submit the form
+  - Wait to get success confirmation message. It will include the transaction hash code.
+  - If you wait a minute or so, you can click on the link of the transaction hash to view the transaction in the explorer.
+    The transaction should show the `To addresses` section including your test wallet address and the 1000 test ADA amount
 
 ## Set up a PAB database and start your application PAB web server
 The PAB web server process allows client callers to interact with the application contract schema endpoints
@@ -119,6 +122,8 @@ The PAB web server process allows client callers to interact with the applicatio
   ```shell
   cd $HOME/pab-config
   cabal run pab-pay-to-wallet --config testnet/pab-config.yml migrate  
+  
+  # this will create a file-based, key-value store, `plutus-pab.db` file, in the current directory
   ```
 - **In same terminal**, start a PAB webserver up
   ```shell
@@ -126,4 +131,17 @@ The PAB web server process allows client callers to interact with the applicatio
   --config testnet/pab-config.yml webserver \
   --passphrase pab123456789
   ```
+- Wait for the PAB to start printing messages like below. **Note**: it may seem like it is stuck for 10 minutes or so, before it logs
+  the current block/current slot progress.
+  ```
+  ...
+  Current block: 327295. Current slot: 41749136.
+  Current block: 327295. Current slot: 41749150.  
+  ```
+  When the current slot value of the last log line matches the current slot you get when getting the chain tip index,
+  then the PAB web server is fully synched.  **Note**: the block value does not seem to align with the testnet blocks.
+  ```shell
+  curl http://localhost:9083/tip
+  ```
+  
   
