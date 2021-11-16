@@ -5,7 +5,7 @@ This setup guide shows how to deploy a simple, "smart contract" application bund
 Hopefully, this documentation provides a lot of value for others. The contributors of this project welcome your feedback-- both good and bad!
 
 ### Why is this useful?
-- reasons go here
+- TODO
 
 ### Key Details
 - The smart-contract application code is taken from the IOHK Plutus Starter repository. It is a simple guessing game
@@ -14,7 +14,7 @@ Hopefully, this documentation provides a lot of value for others. The contributo
 - The PAB services connect to a Cardano Testnet for on-chain transaction activity
 
 ### Medium article
-
+- TODO
 
 ## Usage Instructions
 
@@ -28,7 +28,7 @@ Hopefully, this documentation provides a lot of value for others. The contributo
     * Build the PAB services bundled with the sample contract into one executable. 
     * Please refer to the [Build Application Bundle guide](2-BUILD_APP_BUNDLE.md) for instructions to set up.
 
-3. **Start all the backend services and the bundled application**
+3. **Start all the backend services and the PAB webserver bundled with contracts**
 
     * Start a relay node pointing at Cardano testnet, `cardano-wallet` API server, `chain-index` and the bundle Application code
     * Please refer to the [Start Services guide](3-START_SERVICES.md) for instructions. 
@@ -36,7 +36,7 @@ Hopefully, this documentation provides a lot of value for others. The contributo
 4. **Interact with the application**
 
     * Set up 2 user wallets and interact with the contract to verify it works
-    * Please refer to the [Use Application guide](4-USE_APP.md) for instructions.
+    * Please refer to the [Use PAB endpoints guide](4-USE_PAB_ENDPOINTS.md) for instructions.
     
 ## Contributors
 
