@@ -21,9 +21,10 @@ import Data.Default (Default (def))
 import GHC.Generics (Generic)
 import Prettyprinter
 
+import Language.PureScript.Bridge (argonaut, equal, genericShow, mkSumType)
 import Data.OpenApi.Schema qualified as OpenApi
 import Playground.Types (FunctionSchema)
-import Plutus.Contracts.PayToWallet qualified as Contracts.PayToWallet
+import Plutus.Contracts.PayToAddress qualified as Contracts.PayToAddress
 import Plutus.PAB.Effects.Contract.Builtin (Builtin, BuiltinHandler (..), HasDefinitions (..), SomeBuiltin (..))
 import Plutus.PAB.Effects.Contract.Builtin qualified as Builtin
 import Plutus.PAB.Run.PSGenerator (HasPSTypes (..))
@@ -31,7 +32,7 @@ import Plutus.PAB.Simulator (SimulatorEffectHandlers)
 import Plutus.PAB.Simulator qualified as Simulator
 import Schema (FormSchema)
 
-data AppContracts = PayToWallet
+data AppContracts = PayToAddress
     deriving (Eq, Ord, Show, Generic)
     deriving anyclass (FromJSON, ToJSON, OpenApi.ToSchema)
 
@@ -39,20 +40,20 @@ instance Pretty AppContracts where
     pretty = viaShow
 
 instance HasPSTypes AppContracts where
-    psTypes = []
+    psTypes = [equal . genericShow . argonaut $ mkSumType @AppContracts]
 
 instance HasDefinitions AppContracts where
-    getDefinitions = [ PayToWallet ]
+    getDefinitions = [ PayToAddress ]
     getContract = getAppContracts
     getSchema = getAppContractsSchema
 
 getAppContractsSchema :: AppContracts -> [FunctionSchema FormSchema]
 getAppContractsSchema = \case
-    PayToWallet      -> Builtin.endpointsToSchemas @Contracts.PayToWallet.PayToWalletSchema
+    PayToAddress      -> Builtin.endpointsToSchemas @Contracts.PayToAddress.PayToAddressSchema
 
 getAppContracts :: AppContracts -> SomeBuiltin
 getAppContracts = \case
-    PayToWallet      -> SomeBuiltin Contracts.PayToWallet.payToWallet
+    PayToAddress      -> SomeBuiltin Contracts.PayToAddress.payToAddress
 
 handlers :: SimulatorEffectHandlers (Builtin AppContracts)
 handlers =

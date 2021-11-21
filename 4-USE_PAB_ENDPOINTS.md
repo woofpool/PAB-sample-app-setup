@@ -89,11 +89,80 @@
   {"passphrase":{"last_updated_at":"2021-11-15T21:51:38.461168757Z"},"address_pool_gap":20,"state":{"status":"syncing","progress":{"quantity":32.57,"unit":"percent"}},"balance":{"reward":{"quantity":0,"unit":"lovelace"},"total":{"quantity":0,"unit":"lovelace"},"available":{"quantity":0,"unit":"lovelace"}},"name":"PAB test wallet #2","delegation":{"next":[],"active":{"status":"not_delegating"}},"id":"6b3deba51763744d4ad85451d8ee9c784d416d07","tip":{"height":{"quantity":1187971,"unit":"block"},"time":"2020-04-25T02:33:36Z","epoch_number":55,"absolute_slot_number":1189120,"slot_number":1120},"assets":{"total":[],"available":[]}}
   ```
 ## Activate the contract for each wallet
+- **In terminal 1**, activate the contract for user1 wallet
+  ```shell
+  curl --location --request POST 'http://localhost:9080/api/contract/activate' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+  "caID": [],
+  "caWallet": {
+  "getWalletId": "9e076253925172656de562da94bb79f303492299"
+  }
+  }'
+  
+  # capture the contract ID response
+  {
+    "unContractInstanceId": "68a928a3-2647-4473-93a1-5c7678577d19"
+  }
+  ```
+- **In Terminal 2**, activate the contract for user2 wallet
+  ```shell
+  curl --location --request POST 'http://localhost:9080/api/contract/activate' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+  "caID": [],
+  "caWallet": {
+  "getWalletId": "6b3deba51763744d4ad85451d8ee9c784d416d07"
+  }
+  }'
+  ```
 
-    - In terminal 1
-        - activate the contract for user1 wallet
-        - invoke lock endpoint to lock value with a secret word
-    - In terminal 2
-        - activate the contract for user2 wallet
-        - invoke guess endpoint
-- verify the wallet transfer is made on successful guess
+## Prepare the request body to invoke the `payAddress` endpoint
+We want to use the `payWallet` endpoint to make a payment from wallet 1 user to wallet 2 user 
+- **In Terminal 2**, find an unused wallet address for wallet 2 user. This will be the receiving address of the money
+  we send from wallet 1 user
+  ```shell
+  curl -H "content-type: application/json" \
+      -XGET localhost:8090/v2/wallets/$WALLET_ID/addresses | jq '.'
+  
+  # copy an unused test wallet address (BECH32) to a text file for use later
+  # e.g., addr_test1qzeqq43xfrv5np53gfvvpfmv2rkxyjxcp4x87zr6985cq67cnsm6pvc6l4pv0gukjmwpyq7yc226hjatttqg003a7kuqj5aw3v
+  ```
+- Using `repl`, build a request body to invoke the `payAddress` endpoint
+  ```shell
+  # change directory to where you've cloned this repo
+  cd $HOME/src/PAB-starter-app-setup
+  
+  # start the repl
+  cabal repl
+  
+  # At the repl prompt, load the module
+  :module Plutus.Contracts.PayToAddress  
+  
+  # make sure you can get info on the function to create the request body
+  :info buildParamsJson
+  
+  # import Data.Text as we need to use the Text package to prepare the request
+  import Data.Text
+  
+  # create the request body and paste the unused address you found above 
+  buildParamsJson 3000000 (pack "addr_test1qzeqq43xfrv5np53gfvvpfmv2rkxyjxcp4x87zr6985cq67cnsm6pvc6l4pv0gukjmwpyq7yc226hjatttqg003a7kuqj5aw3v")  
+
+  # sample response
+  {"amount":{"getValue":[[{"unCurrencySymbol":""},[[{"unTokenName":""},3000000]]]]},"payee":{"getPubKeyHash":"b200562648d94986914258c0a76c50ec6248d80d4c7f087a29e9806b"}}
+  ```
+
+## Invoke the endpoint as wallet 1 user  
+- **In Terminal 1**, look at the available contract definitions
+  ```shell
+  curl --location --request GET 'http://localhost:9080/api/contract/definitions'
+  
+  # we will use the payAddress
+  [{"csrSchemas":[{"argument":{"contents":[["amount",{"tag":"FormSchemaValue"}],["payee",{"contents":[["getPubKeyHash",{"tag":"FormSchemaString"}]],"tag":"FormSchemaObject"}]],"tag":"FormSchemaObject"},"endpointDescription":{"getEndpointDescription":"payAddress"}}],"csrDefinition":[]}]
+  ```
+- Invoke endpoint
+  ```shell
+  
+  ```
+
+## Verify the transfer is successful
