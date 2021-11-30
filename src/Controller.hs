@@ -24,7 +24,7 @@ import Prettyprinter
 import Language.PureScript.Bridge (argonaut, equal, genericShow, mkSumType)
 import Data.OpenApi.Schema qualified as OpenApi
 import Playground.Types (FunctionSchema)
-import Plutus.Contracts.PayToAddress qualified as Contracts.PayToAddress
+import Plutus.Contracts.Game qualified as Contracts.Game
 import Plutus.PAB.Effects.Contract.Builtin (Builtin, BuiltinHandler (..), HasDefinitions (..), SomeBuiltin (..))
 import Plutus.PAB.Effects.Contract.Builtin qualified as Builtin
 import Plutus.PAB.Run.PSGenerator (HasPSTypes (..))
@@ -32,7 +32,7 @@ import Plutus.PAB.Simulator (SimulatorEffectHandlers)
 import Plutus.PAB.Simulator qualified as Simulator
 import Schema (FormSchema)
 
-data AppContracts = PayToAddress
+data AppContracts = Game
     deriving (Eq, Ord, Show, Generic)
     deriving anyclass (FromJSON, ToJSON, OpenApi.ToSchema)
 
@@ -43,17 +43,17 @@ instance HasPSTypes AppContracts where
     psTypes = [equal . genericShow . argonaut $ mkSumType @AppContracts]
 
 instance HasDefinitions AppContracts where
-    getDefinitions = [ PayToAddress ]
+    getDefinitions = [ Game ]
     getContract = getAppContracts
     getSchema = getAppContractsSchema
 
 getAppContractsSchema :: AppContracts -> [FunctionSchema FormSchema]
 getAppContractsSchema = \case
-    PayToAddress      -> Builtin.endpointsToSchemas @Contracts.PayToAddress.PayToAddressSchema
+    Game      -> Builtin.endpointsToSchemas @Contracts.Game.GameSchema
 
 getAppContracts :: AppContracts -> SomeBuiltin
 getAppContracts = \case
-    PayToAddress      -> SomeBuiltin Contracts.PayToAddress.payToAddress
+    Game      -> SomeBuiltin Contracts.Game.game
 
 handlers :: SimulatorEffectHandlers (Builtin AppContracts)
 handlers =

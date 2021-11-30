@@ -44,10 +44,13 @@
   ```shell
   curl -H "content-type: application/json" \
       -XGET localhost:8090/v2/wallets/$WALLET_ID
+  
+  # In the response, if you notice the syncing progress is not 100%
+  # wait until it reaches 100
   ```
   Sample output
   ```log
-  # confirm you see that the wallet has a balance of 1000 test ADA
+  # confirm you see that the wallet has a balance of 1000 test ADA (or 1000000000 LOVELACE)
   {"passphrase":{"last_updated_at":"2021-11-15T19:34:58.812854918Z"},"address_pool_gap":20,"state":{"status":"ready"},"balance":{"reward":{"quantity":0,"unit":"lovelace"},"total":{"quantity":1000000000,"unit":"lovelace"},"available":{"quantity":1000000000,"unit":"lovelace"}},"name":"PAB testing wallet","delegation":{"next":[],"active":{"status":"not_delegating"}},"id":"9e076253925172656de562da94bb79f303492299","tip":{"height":{"quantity":3076110,"unit":"block"},"time":"2021-11-15T21:43:17Z","epoch_number":169,"absolute_slot_number":42643381,"slot_number":4981},"assets":{"total":[],"available":[]}}
   ```
 ## Create test wallet #2 in 2nd terminal.  This wallet will receive some test ADA from test wallet #1
@@ -80,8 +83,11 @@
   export WALLET_ID=<paste wallet ID you just created above>
 - Send GET request to get wallet details and verify the test ADA balance
   ```shell
-  curl -H "content-type: application/json" \
+  curl -H "content-type: application/json" -s \
       -XGET localhost:8090/v2/wallets/$WALLET_ID
+  
+  # In the response, if you notice the syncing progress is not 100%
+  # wait until it reaches 100
   ```
   Sample output
   ```log
@@ -93,11 +99,11 @@
   ```shell
   curl --location --request POST 'http://localhost:9080/api/contract/activate' \
   --header 'Content-Type: application/json' \
-  --data-raw '{
-  "caID": [],
-  "caWallet": {
-  "getWalletId": "9e076253925172656de562da94bb79f303492299"
-  }
+  --data-raw '{ \
+  "caID": [], \
+  "caWallet": { \
+  "getWalletId": "${WALLET_ID}" \
+  } \
   }'
   
   # capture the contract ID response
