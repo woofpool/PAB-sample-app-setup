@@ -142,20 +142,20 @@ We want to use the `payWallet` endpoint to make a payment from wallet 1 user to 
   # start the repl
   cabal repl
   
-  # At the repl prompt, load the module
-  :module Plutus.Contracts.PayToAddress  
+  # At the repl prompt, import modules
+  > import Plutus.Contracts.Game
+  > import Ledger.Ada
+  > import Data.Aeson
+  > import Data.ByteString.Lazy.Char8 as BSL
   
-  # make sure you can get info on the function to create the request body
-  :info buildParamsJson
-  
-  # import Data.Text as we need to use the Text package to prepare the request
-  import Data.Text
-  
-  # create the request body and paste the unused address you found above 
-  buildParamsJson 3000000 (pack "addr_test1qzeqq43xfrv5np53gfvvpfmv2rkxyjxcp4x87zr6985cq67cnsm6pvc6l4pv0gukjmwpyq7yc226hjatttqg003a7kuqj5aw3v")  
+  # create the args data object 
+  > args = LockParams { secretWord = "eagle", amount = lovelaceValueOf 90 } 
 
+  # serialize the args object into JSON string
+  > BSL.putStrLn $ encode args
+  
   # sample response
-  {"amount":{"getValue":[[{"unCurrencySymbol":""},[[{"unTokenName":""},3000000]]]]},"payee":{"getPubKeyHash":"b200562648d94986914258c0a76c50ec6248d80d4c7f087a29e9806b"}}
+  > {"amount":{"getValue":[[{"unCurrencySymbol":""},[[{"unTokenName":""},90]]]]},"secretWord":"eagle"}
   ```
 
 ## Invoke the endpoint as wallet 1 user  
