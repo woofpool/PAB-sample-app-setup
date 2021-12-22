@@ -30,7 +30,7 @@
   export WALLET_ID=<paste wallet ID you just created above>
   
   # get unused wallet addresses
-  curl -H "content-type: application/json" \
+  curl -s -H "content-type: application/json" \
       -XGET localhost:8090/v2/wallets/$WALLET_ID/addresses | jq '.'
      
   ```
@@ -42,8 +42,7 @@
       The transaction should show the `To addresses` section including your test wallet address and the 1000 test ADA amount
 - Send GET request to get wallet details and verify the test ADA balance
   ```shell
-  curl -H "content-type: application/json" \
-      -XGET localhost:8090/v2/wallets/$WALLET_ID
+  curl -s -H "content-type: application/json" -XGET localhost:8090/v2/wallets/$WALLET_ID | jq .
   
   # In the response, if you notice the syncing progress is not 100%
   # wait until it reaches 100
@@ -83,7 +82,7 @@
   export WALLET_ID=<paste wallet ID you just created above>
 - Send GET request to get wallet details and verify the test ADA balance
   ```shell
-  curl -H "content-type: application/json" -s \
+  curl -s -H "content-type: application/json" -s \
       -XGET localhost:8090/v2/wallets/$WALLET_ID
   
   # In the response, if you notice the syncing progress is not 100%
@@ -123,7 +122,7 @@
   }'
   ```
 
-## Prepare the request body to invoke the `payAddress` endpoint
+## Prepare the request body to invoke the `lock` endpoint
 We want to use the `payWallet` endpoint to make a payment from wallet 1 user to wallet 2 user 
 - **In Terminal 2**, find an unused wallet address for wallet 2 user. This will be the receiving address of the money
   we send from wallet 1 user
@@ -149,26 +148,56 @@ We want to use the `payWallet` endpoint to make a payment from wallet 1 user to 
   > import Data.ByteString.Lazy.Char8 as BSL
   
   # create the args data object 
-  > args = LockParams { secretWord = "eagle", amount = lovelaceValueOf 90 } 
+  > args = LockParams { secretWord = "eagle", amount = lovelaceValueOf 2000000 } 
 
   # serialize the args object into JSON string
   > BSL.putStrLn $ encode args
   
   # sample response
-  > {"amount":{"getValue":[[{"unCurrencySymbol":""},[[{"unTokenName":""},90]]]]},"secretWord":"eagle"}
+  > {"amount":{"getValue":[[{"unCurrencySymbol":""},[[{"unTokenName":""},2000000]]]]},"secretWord":"eagle"}
   ```
 
 ## Invoke the endpoint as wallet 1 user  
-- **In Terminal 1**, look at the available contract definitions
+- **In Terminal 1**, look at the status of the contract for wallet 1 user
   ```shell
-  curl --location --request GET 'http://localhost:9080/api/contract/definitions'
+  curl --location --request GET 'http://localhost:9080/api/contract/instance/68a928a3-2647-4473-93a1-5c7678577d19/status'
   
-  # we will use the payAddress
-  [{"csrSchemas":[{"argument":{"contents":[["amount",{"tag":"FormSchemaValue"}],["payee",{"contents":[["getPubKeyHash",{"tag":"FormSchemaString"}]],"tag":"FormSchemaObject"}]],"tag":"FormSchemaObject"},"endpointDescription":{"getEndpointDescription":"payAddress"}}],"csrDefinition":[]}]
+  # verify that lock is available in the hooks section  
   ```
-- Invoke endpoint
+- POST request to `lock` endpoint
+  The amount of ADA needs to be more than the minimum amount defined by network protocol parameters. In the example code below, 
+  we use 2 ADA or 2000000 lovelaces
   ```shell
+  curl --location --request POST 'http://localhost:9080/api/contract/instance/68a928a3-2647-4473-93a1-5c7678577d19/endpoint/lock' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{"amount":{"getValue":[[{"unCurrencySymbol":""},[[{"unTokenName":""},2000000]]]]},"secretWord":"eagle"}'
   
+  # check the logs in the terminal where the PAB server is running to ensure no errors
+  # here is a sample output for a successful invocation
+  [pab:Info:7560] [2021-12-01 13:58:54.98 UTC] ae437806-2b0d-4995-8346-506f31906952: "Pay Value (Map [(,Map [(\"\",2000000)])]) to the script"
+  [pab:Info:7560] [2021-12-01 13:58:55.12 UTC] ae437806-2b0d-4995-8346-506f31906952: "Waiting for guess or lock endpoint..."
+  ```
+- Query the wallet information to make sure the balance has decreased by 2 ADA
+  ```shell
+  # ensure WALLET_ID env variable is set
+  curl -H "content-type: application/json" -XGET localhost:8090/v2/wallets/$WALLET_ID
+  
+  # verify balance info
   ```
 
-## Verify the transfer is successful
+## Make a successful guess as wallet 2 user
+- POST good-guess request to `guess` endpoint
+  ```shell
+  # ensure the contract_id is correct for wallet 2 user
+  curl --location --request POST 'http://localhost:9080/api/contract/instance/58f06e66-06f2-4770-b2c4-a93b5cb3844b/endpoint/guess' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{"guessWord": "eagle"}'
+  
+  # check the logs in the terminal where the PAB server is running to ensure no errors
+  # here is a sample output for a successful invocation
+  [pab:Info:7560] [2021-12-01 13:58:54.98 UTC] ae437806-2b0d-4995-8346-506f31906952: "Pay Value (Map [(,Map [(\"\",2000000)])]) to the script"
+  [pab:Info:7560] [2021-12-01 13:58:55.12 UTC] ae437806-2b0d-4995-8346-506f31906952: "Waiting for guess or lock endpoint..."
+  ```
+
+
+## Verify the funds have been transferred to wallet 2 user

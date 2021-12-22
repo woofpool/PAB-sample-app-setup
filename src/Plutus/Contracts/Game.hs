@@ -30,6 +30,7 @@ module Plutus.Contracts.Game
     , gameValidator
     , hashString
     , clearString
+    , isGoodGuess
     -- * Address
     , gameAddress
     , validateGuess
